@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 const url = require('url');
 
-const MYSQL_PUBLIC_URL = '';
+const MYSQL_PUBLIC_URL = process.env.MYSQL_PUBLIC_URL;
 
 const params = url.parse(MYSQL_PUBLIC_URL);
 const [user, password] = params.auth.split(':');
