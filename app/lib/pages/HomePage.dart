@@ -1,6 +1,21 @@
+import 'package:app/services/DBService.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late Future<String> nom;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    nom = DbService().getData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,42 +28,64 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.green,
         leading: IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
       ),
-      body: Column(
-        children: [
-          Padding(padding: EdgeInsets.all(3)),
+      body: FutureBuilder<String>(
+        future: nom,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } 
+          
+          else if (snapshot.hasError) {
+            return Center(child: Text("Erreur : ${snapshot.error}"));
+          } 
+          
+          else {
+            final data = snapshot.data!;
 
-          Container(
-            width: 350,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Catégorie",
-              textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 20,
+            return SingleChildScrollView(
+              child: Column(
                 children: [
-                  buildCard(),
-                  buildCard(),
-                  buildCard(),
-                  buildCard(),
+                  Padding(padding: EdgeInsets.all(3)),
+
+                  Container(
+                    width: 350,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Catégorie",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 20,
+                        children: [
+                          buildCard(data),
+                          buildCard(data),
+                          buildCard(data),
+                          buildCard(data),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
-        ],
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget buildCard() {
+  Widget buildCard(String nom) {
     return Card(
       elevation: 10,
       color: Colors.grey[300],
@@ -58,17 +95,21 @@ class HomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Padding(padding: EdgeInsets.all(5)),
+
             Container(
               width: 225,
               alignment: Alignment.centerLeft,
               child: Text(
-                "M ton pain",
+                nom,
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
+
             Padding(padding: EdgeInsets.all(1)),
+
             Image.asset("lib/img.jpg", width: 250, height: 130),
+
             Padding(padding: EdgeInsets.all(5)),
           ],
         ),
