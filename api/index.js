@@ -78,9 +78,15 @@ async function getDataId(id) {
     }
 }
 
-app.get("/boulangerie", async (request, result) => {
+app.get("/boulangerie/getData", async (request, result) => {
+    const data = await getData();
+
+    result.json(data);
+})
+
+app.get("/boulangerie/getDataId/", async (request, result) => {
     const id = request.query.id;
-    const data = id ? await getDataId(id) : await getData()
+    const data = await getDataId(id);
 
     result.json(data);
 })
