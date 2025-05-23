@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    nom = DbService().getData();
+    nom = DbService().getNom(1);
   }
 
   @override
