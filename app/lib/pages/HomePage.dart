@@ -1,4 +1,5 @@
 import 'package:app/pages/DescriptionPage.dart';
+import 'package:app/widgets/AppBar.dart';
 import 'package:app/services/DBService.dart';
 import 'package:flutter/material.dart';
 
@@ -19,15 +20,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Baker'eat"),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(icon: const Icon(Icons.shopping_cart), onPressed: () {}),
-        ],
-        backgroundColor: Colors.green,
-        leading: IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
-      ),
+      appBar: NavBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
