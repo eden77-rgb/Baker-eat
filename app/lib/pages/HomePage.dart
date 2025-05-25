@@ -1,3 +1,4 @@
+import 'package:app/pages/DescriptionPage.dart';
 import 'package:app/services/DBService.dart';
 import 'package:flutter/material.dart';
 
@@ -88,35 +89,46 @@ class _HomePageState extends State<HomePage> {
           final nom = snapshot.data![0];
           final image = snapshot.data![1];
 
-          return Card(
-            elevation: 10,
-            color: Colors.grey[300],
-            child: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(5)),
+          return InkWell(
+            onTap: () {
+              print("Card $id cliqué");
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => DescriptionPage(id: id),
+                )
+              );
+            },
+            child: Card(
+              elevation: 10,
+              color: Colors.grey[300],
+              child: Padding(
+                padding: const EdgeInsets.all(0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.all(5)),
 
-                  Container(
-                    width: 225,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      nom,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      width: 225,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        nom,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
 
-                  Padding(padding: EdgeInsets.all(1)),
+                    Padding(padding: EdgeInsets.all(1)),
 
-                  Image.network(image, width: 250, height: 130),
+                    Image.network(image, width: 250, height: 130),
 
-                  Padding(padding: EdgeInsets.all(5)),
-                ],
+                    Padding(padding: EdgeInsets.all(5)),
+                  ],
+                ),
               ),
             ),
           );
