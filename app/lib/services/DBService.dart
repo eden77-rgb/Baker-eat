@@ -28,4 +28,16 @@ class DbService {
 
     return jsonData[0]["image"];
   }
+
+  static Future<String> getAdresse(int id) async {
+    final List<dynamic> jsonData = await getData(id);
+
+    return jsonData[0]["adresse"];
+  }
+
+  static Future<String> getDescription(int id) async {
+    final List<dynamic> jsonData = await getData(id);
+
+    return jsonData[0]["description"];
+  }
 }

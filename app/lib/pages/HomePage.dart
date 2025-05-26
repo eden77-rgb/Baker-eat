@@ -1,5 +1,5 @@
 import 'package:app/pages/DescriptionPage.dart';
-import 'package:app/widgets/AppBar.dart';
+import 'package:app/widgets/NavBar.dart';
 import 'package:app/services/DBService.dart';
 import 'package:flutter/material.dart';
 
