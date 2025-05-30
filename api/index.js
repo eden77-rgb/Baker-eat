@@ -1,4 +1,4 @@
-/* API : https://api-nodejs-production-c1fe.up.railway.app/boulangerie */
+/* API : https://api-nodejs-production-c1fe.up.railway.app/boulangerie/getData */
 
 require('dotenv').config();
 const express = require('express');
@@ -13,6 +13,8 @@ const API_PORT = process.env.API_PORT;
 const params = url.parse(MYSQL_PUBLIC_URL);
 const [user, password] = params.auth.split(':');
 
+const allowedTables = ['boulangeries', 'produits', 'boulangeries_produits'];
+
 async function initDB(params) {
     return await mysql.createConnection({
         host: params.hostname,
@@ -26,12 +28,16 @@ async function initDB(params) {
     });
 }
 
-async function getData() {
+async function getData(table) {
+    if (!allowedTables.includes(table)) {
+        throw new Error('Table non autorisée');
+    }
+
     const db = await initDB(params) 
 
     try {
         
-        const rows = await db.execute('SELECT * FROM boulangerie');
+        const rows = await db.execute(`SELECT * FROM ${table}`);
 
         if (rows.length == 0) {
             console.log("Aucun utilisateur trouvé avec cet ID");
@@ -52,15 +58,19 @@ async function getData() {
     }
 }
 
-async function getDataId(id) {
+async function getDataId(table, id) {
+    if (!allowedTables.includes(table)) {
+        throw new Error('Table non autorisée');
+    }
+
     const db = await initDB(params) 
 
     try {
         
-        const rows = await db.execute('SELECT * FROM boulangerie WHERE id = ?', [id]);
+        const rows = await db.execute(`SELECT * FROM ${table} WHERE id = ?`, [id]);
 
         if (rows.length == 0) {
-            console.log("Aucun utilisateur trouvé avec cet ID");
+            console.log("Aucun donnée trouvé avec cet ID");
         }
 
         else {
@@ -78,18 +88,47 @@ async function getDataId(id) {
     }
 }
 
-app.get("/boulangerie/getData", async (request, result) => {
-    const data = await getData();
+app.get("/boulangeries/getData", async (request, result) => {
+    const data = await getData("boulangeries");
 
     result.json(data);
 })
 
-app.get("/boulangerie/getDataId/", async (request, result) => {
+app.get("/boulangeries/getDataId/", async (request, result) => {
     const id = request.query.id;
-    const data = await getDataId(id);
+    const data = await getDataId("boulangeries", id);
 
     result.json(data);
 })
+
+
+app.get("/produits/getData", async (request, result) => {
+    const data = await getData("produits");
+
+    result.json(data);
+})
+
+app.get("/produits/getDataId/", async (request, result) => {
+    const id = request.query.id;
+    const data = await getDataId("produits", id);
+
+    result.json(data);
+})
+
+
+app.get("/boulangeries_produits/getData", async (request, result) => {
+    const data = await getData("boulangeries_produits");
+
+    result.json(data);
+})
+
+app.get("/boulangeries_produits/getDataId/", async (request, result) => {
+    const id = request.query.id;
+    const data = await getDataId("boulangeries_produits", id);
+
+    result.json(data);
+})
+
 
 app.listen(API_PORT, () => {
     console.log(`Server running on port ${API_PORT}`);

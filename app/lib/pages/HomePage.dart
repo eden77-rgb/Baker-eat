@@ -84,7 +84,6 @@ class _HomePageState extends State<HomePage> {
 
           return InkWell(
             onTap: () {
-              print("Card $id cliqué");
               Navigator.push(
                 context, 
                 MaterialPageRoute(
