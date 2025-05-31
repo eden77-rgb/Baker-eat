@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 
 class DbService {
 
-  static Future<List<dynamic>> getData(int id) async {
-    final reponse = await http.get(Uri.parse("https://api-nodejs-production-c1fe.up.railway.app/boulangeries/getDataId?id=${id.toString()}"));
+  static Future<List<dynamic>> getData(String table, int id) async {
+    final reponse = await http.get(Uri.parse("https://api-nodejs-production-c1fe.up.railway.app/${table.toString()}/getDataId?id=${id.toString()}"));
   
     if (reponse.statusCode == 200) {
       final data = jsonDecode(reponse.body);
@@ -17,27 +17,33 @@ class DbService {
     }
   }
 
-  static Future<String> getNom(int id) async {
-    final List<dynamic> jsonData = await getData(id);
+  static Future<String> getNom(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
 
     return jsonData[0]["nom"];
   }
 
-  static Future<String> getImg(int id) async {
-    final List<dynamic> jsonData = await getData(id);
+  static Future<String> getImg(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
 
     return jsonData[0]["image"];
   }
 
-  static Future<String> getAdresse(int id) async {
-    final List<dynamic> jsonData = await getData(id);
+  static Future<String> getAdresse(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
 
     return jsonData[0]["adresse"];
   }
 
-  static Future<String> getDescription(int id) async {
-    final List<dynamic> jsonData = await getData(id);
+  static Future<String> getDescription(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
 
     return jsonData[0]["description"];
+  }
+
+  static Future<String> getCategorie(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
+
+    return jsonData[0]["categorie"];
   }
 }

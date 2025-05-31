@@ -2,20 +2,20 @@ import 'package:app/services/DBService.dart';
 import 'package:app/widgets/NavBar.dart';
 import 'package:flutter/material.dart';
 
-class DescriptionPage extends StatelessWidget {
+class ProduitsPage extends StatelessWidget{
   final int id;
 
-  DescriptionPage({required this.id});
+  ProduitsPage({required this.id});
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return FutureBuilder<List<String>>(
       future: Future.wait([
-        DbService.getNom(id),
-        DbService.getImg(id),
-        DbService.getAdresse(id),
-        DbService.getDescription(id),
+        DbService.getNom("produits", id),
+        DbService.getImg("produits", id),
+        DbService.getCategorie("produits", id),
+        DbService.getDescription("produits", id),
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

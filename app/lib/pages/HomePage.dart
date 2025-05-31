@@ -1,4 +1,5 @@
-import 'package:app/pages/DescriptionPage.dart';
+import 'package:app/pages/BoulangeriePage.dart';
+import 'package:app/pages/ProduitsPage.dart';
 import 'package:app/widgets/NavBar.dart';
 import 'package:app/services/DBService.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _HomePageState extends State<HomePage> {
               width: 350,
               alignment: Alignment.centerLeft,
               child: Text(
-                "Boulangerie",
+                "Boulangeries",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -44,10 +45,37 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 20,
                   children: [
-                    buildCard(1),
-                    buildCard(2),
-                    buildCard(3),
-                    buildCard(4),
+                    buildCard("boulangeries", 1, BoulangeriePage(id: 1)),
+                    buildCard("boulangeries", 2, BoulangeriePage(id: 2)),
+                    buildCard("boulangeries", 3, BoulangeriePage(id: 3)),
+                    buildCard("boulangeries", 4, BoulangeriePage(id: 4)),
+                  ],
+                ),
+              ),
+            ),
+
+            Container(
+              width: 350,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Produits",
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 20,
+                  children: [
+                    buildCard("produits", 1, ProduitsPage(id: 1)),
+                    buildCard("produits", 2, ProduitsPage(id: 2)),
+                    buildCard("produits", 3, ProduitsPage(id: 3)),
+                    buildCard("produits", 4, ProduitsPage(id: 4)),
                   ],
                 ),
               ),
@@ -58,9 +86,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildCard(int id) {
+  Widget buildCard(String table, int id, StatelessWidget page) {
     return FutureBuilder<List<String>>(
-      future: Future.wait([DbService.getNom(id), DbService.getImg(id)]),
+      future: Future.wait([DbService.getNom(table, id), DbService.getImg(table, id)]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
@@ -76,7 +104,7 @@ class _HomePageState extends State<HomePage> {
             height: 180,
             child: Center(child: Text("Erreur: ${snapshot.error}")),
           );
-        } 
+        }
         
         else {
           final nom = snapshot.data![0];
@@ -87,7 +115,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context, 
                 MaterialPageRoute(
-                  builder: (context) => DescriptionPage(id: id),
+                  builder: (context) => page,
                 )
               );
             },
