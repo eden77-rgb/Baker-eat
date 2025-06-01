@@ -17,7 +17,7 @@ class ProduitsPage extends StatelessWidget {
         DbService.getCategorie("produits", id),
         DbService.getDescription("produits", id),
 
-        DbService.getDataPrix(id)
+        DbService.getDataPrix(id),
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -37,7 +37,7 @@ class ProduitsPage extends StatelessWidget {
           final image = snapshot.data![1];
           final categorie = snapshot.data![2];
           final description = snapshot.data![3];
-          
+
           final produits = snapshot.data![4];
 
           return Scaffold(
@@ -65,9 +65,36 @@ class ProduitsPage extends StatelessWidget {
 
                   Padding(padding: EdgeInsets.all(2)),
 
-                  Text(
-                    "Description : ${description}",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          "Description :",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+
+                        Text(
+                          description,
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(padding: EdgeInsets.all(10)),
+
+                  Center(
+                    child: Text(
+                      "Disponibilité :",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                   ),
 
                   ListView.builder(
@@ -83,21 +110,17 @@ class ProduitsPage extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Column(
                           children: [
-                          Divider(
-                            thickness: 2, 
-                            color: Colors.black
-                          ),
-                          Text("$boulangerie - $prix"),
+                            Divider(thickness: 2, color: Colors.black),
+                            Text("$boulangerie - $prix€"),
                           ],
                         ),
                       );
                     },
-
-                  )
+                  ),
                 ],
               ),
             ),
-            
+
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
@@ -109,14 +132,11 @@ class ProduitsPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   backgroundColor: Colors.green,
-                  textStyle: TextStyle(fontSize: 10)
+                  textStyle: TextStyle(fontSize: 10),
                 ),
                 child: Text(
                   "Ajouter au panier",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black
-                  ),
+                  style: TextStyle(fontSize: 20, color: Colors.black),
                 ),
               ),
             ),
