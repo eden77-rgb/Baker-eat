@@ -46,4 +46,10 @@ class DbService {
 
     return jsonData[0]["categorie"];
   }
+
+  static Future<String> getPrix(String table, int id) async {
+    final List<dynamic> jsonData = await getData(table, id);
+
+    return jsonData[0]["prix"];
+  }
 }

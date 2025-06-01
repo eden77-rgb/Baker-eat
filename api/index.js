@@ -33,10 +33,10 @@ async function getData(table) {
         throw new Error('Table non autorisée');
     }
 
-    const db = await initDB(params) 
+    const db = await initDB(params)
 
     try {
-        
+
         const rows = await db.execute(`SELECT * FROM ${table}`);
 
         if (rows.length == 0) {
@@ -47,12 +47,12 @@ async function getData(table) {
             return rows[0];
         }
     }
-    
+
     catch (err) {
         console.error('Erreur lors de la requête:', err);
         return [];
-    } 
-    
+    }
+
     finally {
         await db.end();
     }
@@ -63,10 +63,10 @@ async function getDataId(table, id) {
         throw new Error('Table non autorisée');
     }
 
-    const db = await initDB(params) 
+    const db = await initDB(params)
 
     try {
-        
+
         const rows = await db.execute(`SELECT * FROM ${table} WHERE id = ?`, [id]);
 
         if (rows.length == 0) {
@@ -77,12 +77,49 @@ async function getDataId(table, id) {
             return rows[0];
         }
     }
-    
+
     catch (err) {
         console.error('Erreur lors de la requête:', err);
         return [];
-    } 
-    
+    }
+
+    finally {
+        await db.end();
+    }
+}
+
+async function getPrix() {
+    const db = await initDB(params)
+
+    try {
+
+        const rows = await db.execute(`
+            SELECT 
+                b.nom AS boulangerie,
+                p.nom AS produit,
+                bp.prix,
+                bp.disponible
+            FROM boulangeries b
+            JOIN boulangeries_produits bp
+                ON b.id = bp.boulangerie_id
+            JOIN produits p
+                ON p.id = bp.produit_id`
+        );
+
+        if (rows.length == 0) {
+            console.log("Aucun donnée trouvé avec cet ID");
+        }
+
+        else {
+            return rows[0];
+        }
+    }
+
+    catch (err) {
+        console.error('Erreur lors de la requête:', err);
+        return [];
+    }
+
     finally {
         await db.end();
     }
@@ -125,6 +162,12 @@ app.get("/boulangeries_produits/getData", async (request, result) => {
 app.get("/boulangeries_produits/getDataId/", async (request, result) => {
     const id = request.query.id;
     const data = await getDataId("boulangeries_produits", id);
+
+    result.json(data);
+})
+
+app.get("/boulangeries_produits/getPrix/", async (request, result) => {
+    const data = await getPrix();
 
     result.json(data);
 })
