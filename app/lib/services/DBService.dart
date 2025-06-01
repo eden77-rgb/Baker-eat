@@ -3,16 +3,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class DbService {
-
   static Future<List<dynamic>> getData(String table, int id) async {
-    final reponse = await http.get(Uri.parse("https://api-nodejs-production-c1fe.up.railway.app/${table.toString()}/getDataId?id=${id.toString()}"));
-  
+    final reponse = await http.get(
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/${table.toString()}/getDataId?id=${id.toString()}",
+      ),
+    );
+
     if (reponse.statusCode == 200) {
       final data = jsonDecode(reponse.body);
       return data;
-    }
-
-    else {
+    } else {
       throw Exception("Erreur lors de la requête");
     }
   }
@@ -47,9 +48,48 @@ class DbService {
     return jsonData[0]["categorie"];
   }
 
-  static Future<String> getPrix(String table, int id) async {
-    final List<dynamic> jsonData = await getData(table, id);
+  static Future<List<dynamic>> getDataPrix(int id) async {
+    final reponse = await http.get(
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/boulangeries_produits/getPrix?id=${id.toString()}",
+      ),
+    );
 
-    return jsonData[0]["prix"];
+    if (reponse.statusCode == 200) {
+      final data = jsonDecode(reponse.body);
+      return data;
+    } else {
+      throw Exception("Erreur lors de la requête");
+    }
+  }
+
+  static Future<String> getTaille(int id) async {
+    final List<dynamic> jsonData = await getDataPrix(id);
+
+    return jsonData.length.toString();
+  }
+
+  static Future<String> getBoulangerie(int index, int id) async {
+    final List<dynamic> jsonData = await getDataPrix(id);
+
+    return jsonData[index]["boulangerie"];
+  }
+
+  static Future<String> getProduit(int index, int id) async {
+    final List<dynamic> jsonData = await getDataPrix(id);
+
+    return jsonData[index]["produit"];
+  }
+
+  static Future<String> getPrix(int index, int id) async {
+    final List<dynamic> jsonData = await getDataPrix(id);
+
+    return jsonData[index]["prix"];
+  }
+
+  static Future<String> getDisponible(int index, int id) async {
+    final List<dynamic> jsonData = await getDataPrix(id);
+
+    return jsonData[index]["disponible"].toString();
   }
 }

@@ -10,13 +10,14 @@ class ProduitsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return FutureBuilder<List<String>>(
+    return FutureBuilder<List<dynamic>>(
       future: Future.wait([
         DbService.getNom("produits", id),
         DbService.getImg("produits", id),
         DbService.getCategorie("produits", id),
         DbService.getDescription("produits", id),
-        DbService.getPrix("boulangeries_produits", id)
+
+        DbService.getDataPrix(id)
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -36,7 +37,8 @@ class ProduitsPage extends StatelessWidget {
           final image = snapshot.data![1];
           final categorie = snapshot.data![2];
           final description = snapshot.data![3];
-          final prix = snapshot.data![4];
+          
+          final produits = snapshot.data![4];
 
           return Scaffold(
             appBar: NavBar(),
@@ -59,22 +61,43 @@ class ProduitsPage extends StatelessWidget {
 
                   Center(child: Image.network(image, width: 350)),
 
-                  Text("${categorie} - ${prix}"),
+                  Text("Categorie : ${categorie}"),
 
                   Padding(padding: EdgeInsets.all(2)),
 
                   Text(
-                    "Description : ",
+                    "Description : ${description}",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
 
-                  Container(
-                    width: 350,
-                    child: Text(description, textAlign: TextAlign.center),
-                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: produits.length,
+                    itemBuilder: (context, index) {
+                      final produit = produits[index];
+                      final boulangerie = produit["boulangerie"];
+                      final prix = produit["prix"];
+
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          children: [
+                          Divider(
+                            thickness: 2, 
+                            color: Colors.black
+                          ),
+                          Text("$boulangerie - $prix"),
+                          ],
+                        ),
+                      );
+                    },
+
+                  )
                 ],
               ),
             ),
+            
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(

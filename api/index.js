@@ -88,7 +88,7 @@ async function getDataId(table, id) {
     }
 }
 
-async function getPrix() {
+async function getPrix(id) {
     const db = await initDB(params)
 
     try {
@@ -103,7 +103,9 @@ async function getPrix() {
             JOIN boulangeries_produits bp
                 ON b.id = bp.boulangerie_id
             JOIN produits p
-                ON p.id = bp.produit_id`
+                ON p.id = bp.produit_id
+            WHERE p.id = ?
+            `, [id]
         );
 
         if (rows.length == 0) {
@@ -167,7 +169,8 @@ app.get("/boulangeries_produits/getDataId/", async (request, result) => {
 })
 
 app.get("/boulangeries_produits/getPrix/", async (request, result) => {
-    const data = await getPrix();
+    const id = request.query.id;
+    const data = await getPrix(id);
 
     result.json(data);
 })
