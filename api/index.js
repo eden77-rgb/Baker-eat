@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const express = require('express');
+const { request } = require('http');
 const mysql = require('mysql2/promise');
 const url = require('url');
 
@@ -107,7 +108,37 @@ async function getPrix(id) {
                 ON p.id = bp.produit_id
             WHERE p.id = ?
         `, [id]);
-        
+
+
+        if (rows.length == 0) {
+            console.log("Aucun donnée trouvé avec cet ID");
+        }
+
+        else {
+            return rows[0];
+        }
+    }
+
+    catch (err) {
+        console.error('Erreur lors de la requête:', err);
+        return [];
+    }
+
+    finally {
+        await db.end();
+    }
+}
+
+async function postProduitsPanier(panier_id, boulangerie_produit_id, quantite) {
+    const db = await initDB(params)
+
+    try {
+
+        const rows = await db.execute(`
+            INSERT INTO paniers_produits (panier_id, boulangerie_produit_id, quantite)
+            VALUES (?, ?, ?)
+        `, [panier_id, boulangerie_produit_id, quantite]);
+
 
         if (rows.length == 0) {
             console.log("Aucun donnée trouvé avec cet ID");
@@ -176,6 +207,24 @@ app.get("/boulangeries_produits/getPrix/", async (request, result) => {
     result.json(data);
 })
 
+
+app.post("/paniers_produits/ajouter", async (req, res) => {
+    const { panier_id, boulangerie_produit_id, quantite } = req.body
+
+    if (!panier_id || !boulangerie_produit_id || !quantite) {
+        return res.status(400).json({ message: "Champs manquants" });
+    }
+
+    try {
+        const result = await postProduitsPanier(panier_id, boulangerie_produit_id, quantite)
+        res.status(201).json({ message: "Produit ajouté au panier", result })
+    }
+
+    catch (err) {
+        console.error("Erreur lors de l'ajout au panier :", err)
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+})
 
 app.listen(API_PORT, () => {
     console.log(`Server running on port ${API_PORT}`);
