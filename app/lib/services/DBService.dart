@@ -63,6 +63,21 @@ class DbService {
     }
   }
 
+  static Future<List<dynamic>> getProduitsBoulangeires() async {
+    final reponse = await http.get(
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/getProduit",
+      ),
+    );
+
+    if (reponse.statusCode == 200) {
+      final data = jsonDecode(reponse.body);
+      return data;
+    } else {
+      throw Exception("Erreur lors de la requête");
+    }
+  }
+
   static Future<String> getTaille(int id) async {
     final List<dynamic> jsonData = await getDataPrix(id);
 

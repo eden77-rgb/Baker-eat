@@ -1,3 +1,4 @@
+import 'package:app/pages/PanierPage.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget implements PreferredSizeWidget {
@@ -8,7 +9,16 @@ class NavBar extends StatelessWidget implements PreferredSizeWidget {
       title: const Text("Baker'eat"),
       centerTitle: true,
       actions: <Widget>[
-        IconButton(icon: const Icon(Icons.shopping_cart), onPressed: () {}),
+        IconButton(
+          icon: const Icon(Icons.shopping_cart), 
+          onPressed: () {
+            Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => PanierPage(),
+                )
+              );
+          }),
       ],
       backgroundColor: Colors.green,
       leading: IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
