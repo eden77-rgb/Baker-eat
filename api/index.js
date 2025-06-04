@@ -95,6 +95,7 @@ async function getPrix(id) {
 
         const rows = await db.execute(`
             SELECT 
+                bp.id AS id,
                 b.nom AS boulangerie,
                 p.nom AS produit,
                 bp.prix,
@@ -105,8 +106,8 @@ async function getPrix(id) {
             JOIN produits p
                 ON p.id = bp.produit_id
             WHERE p.id = ?
-            `, [id]
-        );
+        `, [id]);
+        
 
         if (rows.length == 0) {
             console.log("Aucun donnée trouvé avec cet ID");

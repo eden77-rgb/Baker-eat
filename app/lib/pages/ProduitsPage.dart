@@ -125,8 +125,71 @@ class ProduitsPage extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("$nom ajouté au panier")),
+                  final produits = snapshot.data![4];
+
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return ListView.builder(
+                        itemCount: produits.length,
+                        itemBuilder: (context, index) {
+                          final produit = produits[index];
+                          final nomBoulangerie = produit["boulangerie"];
+                          final prix = produit["prix"];
+                          final boulangeriesProduisId = produit["id"];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              color: Colors.grey[100],
+                              elevation: 3,
+                              child: ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                                title: Text(
+                                  nomBoulangerie,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  "$prix €",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.green[700],
+                                  ),
+                                ),
+                                onTap: () {
+                                  print("$boulangeriesProduisId -> $nomBoulangerie - $prix €");
+                                  Navigator.pop(context);
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "$nom ajouté au panier chez $nomBoulangerie",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                trailing: Icon(
+                                  Icons.add_shopping_cart,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   );
                 },
                 style: ElevatedButton.styleFrom(
