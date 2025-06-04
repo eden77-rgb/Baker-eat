@@ -207,6 +207,7 @@ app.get("/boulangeries_produits/getPrix/", async (request, result) => {
     result.json(data);
 })
 
+app.use(express.json());
 
 app.post("/paniers_produits/ajouter", async (req, res) => {
     const { panier_id, boulangerie_produit_id, quantite } = req.body

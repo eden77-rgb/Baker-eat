@@ -92,4 +92,22 @@ class DbService {
 
     return jsonData[index]["disponible"].toString();
   }
+
+  static Future<void> ajouterAuPanier(int panierId, int boulangerieProduitId, int quantite,) async {
+    final response = await http.post(
+      Uri.parse("https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/ajouter"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "panier_id": panierId,
+        "boulangerie_produit_id": boulangerieProduitId,
+        "quantite": quantite,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      print("✅ Produit ajouté au panier");
+    } else {
+      print("❌ Erreur: ${response.statusCode} - ${response.body}");
+    }
+  }
 }

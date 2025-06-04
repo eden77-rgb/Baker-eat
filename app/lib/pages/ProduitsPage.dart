@@ -4,19 +4,17 @@ import 'package:flutter/material.dart';
 
 class ProduitsPage extends StatelessWidget {
   final int id;
-
+  
   ProduitsPage({required this.id});
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return FutureBuilder<List<dynamic>>(
       future: Future.wait([
         DbService.getNom("produits", id),
         DbService.getImg("produits", id),
         DbService.getCategorie("produits", id),
         DbService.getDescription("produits", id),
-
         DbService.getDataPrix(id),
       ]),
       builder: (context, snapshot) {
@@ -37,7 +35,6 @@ class ProduitsPage extends StatelessWidget {
           final image = snapshot.data![1];
           final categorie = snapshot.data![2];
           final description = snapshot.data![3];
-
           final produits = snapshot.data![4];
 
           return Scaffold(
@@ -46,7 +43,6 @@ class ProduitsPage extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   Padding(padding: EdgeInsets.all(5)),
-
                   Center(
                     child: Text(
                       nom,
@@ -56,15 +52,10 @@ class ProduitsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Padding(padding: EdgeInsets.all(5)),
-
                   Center(child: Image.network(image, width: 350)),
-
-                  Text("Categorie : ${categorie}"),
-
+                  Text("Categorie : $categorie"),
                   Padding(padding: EdgeInsets.all(2)),
-
                   Center(
                     child: Column(
                       children: [
@@ -75,7 +66,6 @@ class ProduitsPage extends StatelessWidget {
                             fontSize: 20,
                           ),
                         ),
-
                         Text(
                           description,
                           style: TextStyle(fontSize: 20),
@@ -84,9 +74,7 @@ class ProduitsPage extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   Padding(padding: EdgeInsets.all(10)),
-
                   Center(
                     child: Text(
                       "Disponibilité :",
@@ -96,7 +84,6 @@ class ProduitsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -105,7 +92,6 @@ class ProduitsPage extends StatelessWidget {
                       final produit = produits[index];
                       final boulangerie = produit["boulangerie"];
                       final prix = produit["prix"];
-
                       return Padding(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Column(
@@ -120,72 +106,133 @@ class ProduitsPage extends StatelessWidget {
                 ],
               ),
             ),
-
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 onPressed: () {
-                  final produits = snapshot.data![4];
+                  List<int> quantites = List.generate(produits.length, (_) => 1);
 
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return ListView.builder(
-                        itemCount: produits.length,
-                        itemBuilder: (context, index) {
-                          final produit = produits[index];
-                          final nomBoulangerie = produit["boulangerie"];
-                          final prix = produit["prix"];
-                          final boulangeriesProduisId = produit["id"];
+                      return StatefulBuilder(
+                        builder: (context, setModalState) {
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              color: Colors.grey[100],
-                              elevation: 3,
-                              child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 10,
-                                ),
-                                title: Text(
-                                  nomBoulangerie,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  "$prix €",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.green[700],
-                                  ),
-                                ),
-                                onTap: () {
-                                  print("$boulangeriesProduisId -> $nomBoulangerie - $prix €");
-                                  Navigator.pop(context);
+                          return ListView.builder(
+                            itemCount: produits.length,
+                            itemBuilder: (context, index) {
+                              final produit = produits[index];
+                              final nomBoulangerie = produit["boulangerie"];
+                              final prix = produit["prix"];
+                              final boulangeriesProduisId = produit["id"];
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "$nom ajouté au panier chez $nomBoulangerie",
-                                      ),
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  color: Colors.grey[100],
+                                  elevation: 3,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          nomBoulangerie,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          "$prix €",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.green[700],
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                IconButton(
+                                                  icon: Icon(Icons.remove),
+                                                  onPressed: () {
+                                                    if (quantites[index] > 1) {
+                                                      setModalState(() {
+                                                        quantites[index]--;
+                                                      });
+                                                    }
+                                                  },
+                                                ),
+                                                Text(
+                                                  '${quantites[index]}',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  icon: Icon(Icons.add),
+                                                  onPressed: () {
+                                                    setModalState(() {
+                                                      quantites[index]++;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            ElevatedButton.icon(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                              ),
+                                              icon: Icon(
+                                                Icons.shopping_cart,
+                                                color: Colors.white,
+                                              ),
+                                              label: Text(
+                                                "Ajouter",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                DbService.ajouterAuPanier(
+                                                  1,
+                                                  boulangeriesProduisId,
+                                                  quantites[index],
+                                                );
+
+                                                Navigator.pop(context);
+
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "$nom ajouté au panier chez $nomBoulangerie (x${quantites[index]})",
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                },
-                                trailing: Icon(
-                                  Icons.add_shopping_cart,
-                                  color: Colors.black87,
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            },
                           );
                         },
                       );
@@ -195,7 +242,6 @@ class ProduitsPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   backgroundColor: Colors.green,
-                  textStyle: TextStyle(fontSize: 10),
                 ),
                 child: Text(
                   "Ajouter au panier",
