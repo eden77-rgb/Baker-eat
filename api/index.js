@@ -14,7 +14,7 @@ const API_PORT = process.env.API_PORT;
 const params = url.parse(MYSQL_PUBLIC_URL);
 const [user, password] = params.auth.split(':');
 
-const allowedTables = ['boulangeries', 'produits', 'boulangeries_produits'];
+const allowedTables = ['boulangeries', 'boulangeries_produits', 'paniers_produits', 'paniers', 'produits'];
 
 async function initDB(params) {
     return await mysql.createConnection({
@@ -159,6 +159,45 @@ async function postProduitsPanier(panier_id, boulangerie_produit_id, quantite) {
     }
 }
 
+async function getProduit() {
+    const db = await initDB(params);
+
+    try {
+        const [rows] = await db.execute(`
+            SELECT 
+                pp.id AS id,
+                pp.panier_id,
+                pp.boulangerie_produit_id,
+                pp.quantite,
+                b.nom AS boulangerie,
+                p.nom AS produit,
+                bp.prix,
+                (bp.prix * pp.quantite) AS prix_total
+            FROM paniers_produits pp
+            JOIN boulangeries_produits bp 
+                ON pp.boulangerie_produit_id = bp.id
+            JOIN boulangeries b 
+                ON bp.boulangerie_id = b.id
+            JOIN produits p 
+                ON bp.produit_id = p.id
+
+        `);
+
+        return rows;
+    }
+
+    catch (err) {
+        console.error('Erreur lors de la requête:', err);
+        return [];
+    }
+
+    finally {
+        await db.end();
+    }
+}
+
+
+
 app.get("/boulangeries/getData", async (request, result) => {
     const data = await getData("boulangeries");
 
@@ -206,6 +245,28 @@ app.get("/boulangeries_produits/getPrix/", async (request, result) => {
 
     result.json(data);
 })
+
+
+app.get("/paniers_produits/getDada", async (request, result) => {
+    const data = await getData("paniers_produits");
+
+    result.json(data);
+})
+
+app.get("/paniers_produits/getDadaId", async (request, result) => {
+    const id = request.query.id
+    const data = await getDataId("paniers_produits", id)
+
+    result.json(data);
+})
+
+app.get("/paniers_produits/getProduit", async (request, result) => {
+    const id = request.query.id
+    const data = await getProduit()
+
+    result.json(data);
+})
+
 
 app.use(express.json());
 
