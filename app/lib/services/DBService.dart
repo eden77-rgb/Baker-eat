@@ -108,9 +108,15 @@ class DbService {
     return jsonData[index]["disponible"].toString();
   }
 
-  static Future<void> ajouterAuPanier(int panierId, int boulangerieProduitId, int quantite,) async {
+  static Future<void> ajouterAuPanier(
+    int panierId,
+    int boulangerieProduitId,
+    int quantite,
+  ) async {
     final response = await http.post(
-      Uri.parse("https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/ajouter"),
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/ajouter",
+      ),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "panier_id": panierId,
@@ -126,7 +132,35 @@ class DbService {
     }
   }
 
-  static Future<void> viderPanier() async {}
+  static Future<void> viderPanier(int panierId) async {
+    final response = await http.post(
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/paniers/supprimerProduits",
+      ),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"id_panier": panierId}),
+    );
 
-  static Future<void> supprimerArticlePanier(int id) async {}
+    if (response.statusCode == 200) {
+      print("✅ Panier vidé avec succès");
+    } else {
+      print("❌ Erreur: ${response.statusCode} - ${response.body}");
+    }
+  }
+
+  static Future<void> supprimerArticlePanier(int idProduit) async {
+    final response = await http.post(
+      Uri.parse(
+        "https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/supprimer",
+      ),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"id_produit": idProduit}),
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ Article supprimé du panier");
+    } else {
+      print("❌ Erreur: ${response.statusCode} - ${response.body}");
+    }
+  }
 }

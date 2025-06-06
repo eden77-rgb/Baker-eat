@@ -18,14 +18,18 @@ class _PanierPageState extends State<PanierPage> {
   }
 
   // Re-charge les données après une suppression
-  void _reload() {
-    setState(() => _futurePanier = DbService.getProduitsBoulangeries());
+  Future<void> _reload() async {
+    print("Reload de page");
+    final produits = await DbService.getProduitsBoulangeries();
+    setState(() {
+      _futurePanier = Future.value(produits);
+    });
   }
 
   double _total(List<dynamic> list) => list.fold(
-        0.0,
-        (sum, p) => sum + (double.tryParse(p['prix_total'].toString()) ?? 0),
-      );
+    0.0,
+    (sum, p) => sum + (double.tryParse(p['prix_total'].toString()) ?? 0),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +44,26 @@ class _PanierPageState extends State<PanierPage> {
             onPressed: () async {
               final ok = await showDialog<bool>(
                 context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Vider le panier ?'),
-                  content: const Text('Cette action supprimera tous les articles.'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-                    TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirmer')),
-                  ],
-                ),
+                builder:
+                    (_) => AlertDialog(
+                      title: const Text('Vider le panier ?'),
+                      content: const Text(
+                        'Cette action supprimera tous les articles.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Annuler'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Confirmer'),
+                        ),
+                      ],
+                    ),
               );
               if (ok == true) {
-                await DbService.viderPanier();   // <-- implémente cette méthode côté API
+                await DbService.viderPanier(1);
                 _reload();
               }
             },
@@ -81,11 +94,19 @@ class _PanierPageState extends State<PanierPage> {
                   itemBuilder: (_, i) {
                     final p = produits[i];
                     return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 4,
                       child: ListTile(
-                        title: Text(p['produit'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(
+                          p['produit'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -98,7 +119,7 @@ class _PanierPageState extends State<PanierPage> {
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
-                            await DbService.supprimerArticlePanier(p['id']); // <-- implémente cette méthode
+                            await DbService.supprimerArticlePanier(p['id']);
                             _reload();
                           },
                         ),
@@ -111,15 +132,28 @@ class _PanierPageState extends State<PanierPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total :', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('${total.toStringAsFixed(2)} €',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Total :',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '${total.toStringAsFixed(2)} €',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
