@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ProduitsPage extends StatelessWidget {
   final int id;
-  
+
   ProduitsPage({required this.id});
 
   @override
@@ -92,13 +92,37 @@ class ProduitsPage extends StatelessWidget {
                       final produit = produits[index];
                       final boulangerie = produit["boulangerie"];
                       final prix = produit["prix"];
+
                       return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Column(
-                          children: [
-                            Divider(thickness: 2, color: Colors.black),
-                            Text("$boulangerie - $prix€"),
-                          ],
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.store,
+                              color: Colors.green,
+                            ),
+                            title: Text(
+                              boulangerie,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: Text(
+                              "$prix €",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -110,14 +134,16 @@ class ProduitsPage extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 onPressed: () {
-                  List<int> quantites = List.generate(produits.length, (_) => 1);
+                  List<int> quantites = List.generate(
+                    produits.length,
+                    (_) => 1,
+                  );
 
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
                       return StatefulBuilder(
                         builder: (context, setModalState) {
-
                           return ListView.builder(
                             itemCount: produits.length,
                             itemBuilder: (context, index) {
