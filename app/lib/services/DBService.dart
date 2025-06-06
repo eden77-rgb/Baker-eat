@@ -63,7 +63,7 @@ class DbService {
     }
   }
 
-  static Future<List<dynamic>> getProduitsBoulangeires() async {
+  static Future<List<dynamic>> getProduitsBoulangeries() async {
     final reponse = await http.get(
       Uri.parse(
         "https://api-nodejs-production-c1fe.up.railway.app/paniers_produits/getProduit",
@@ -125,4 +125,8 @@ class DbService {
       print("❌ Erreur: ${response.statusCode} - ${response.body}");
     }
   }
+
+  static Future<void> viderPanier() async {}
+
+  static Future<void> supprimerArticlePanier(int id) async {}
 }
