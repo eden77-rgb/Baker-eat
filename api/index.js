@@ -129,36 +129,6 @@ async function getPrix(id) {
     }
 }
 
-async function postProduitsPanier(panier_id, boulangerie_produit_id, quantite) {
-    const db = await initDB(params)
-
-    try {
-
-        const rows = await db.execute(`
-            INSERT INTO paniers_produits (panier_id, boulangerie_produit_id, quantite)
-            VALUES (?, ?, ?)
-        `, [panier_id, boulangerie_produit_id, quantite]);
-
-
-        if (rows.length == 0) {
-            console.log("Aucun donnée trouvé avec cet ID");
-        }
-
-        else {
-            return rows[0];
-        }
-    }
-
-    catch (err) {
-        console.error('Erreur lors de la requête:', err);
-        return [];
-    }
-
-    finally {
-        await db.end();
-    }
-}
-
 async function getProduit() {
     const db = await initDB(params);
 
@@ -196,6 +166,72 @@ async function getProduit() {
     }
 }
 
+
+async function postProduitsPanier(panier_id, boulangerie_produit_id, quantite) {
+    const db = await initDB(params)
+
+    try {
+
+        const rows = await db.execute(`
+            INSERT INTO paniers_produits (panier_id, boulangerie_produit_id, quantite)
+            VALUES (?, ?, ?)
+        `, [panier_id, boulangerie_produit_id, quantite]);
+
+
+        if (rows.length == 0) {
+            console.log("Aucun donnée trouvé avec cet ID");
+        }
+
+        else {
+            return rows[0];
+        }
+    }
+
+    catch (err) {
+        console.error('Erreur lors de la requête:', err);
+        return [];
+    }
+
+    finally {
+        await db.end();
+    }
+}
+
+async function postDeletePanier(id_panier) {
+    const db = await initDB(params);
+
+    try {
+        await db.execute(`DELETE FROM paniers_produits WHERE panier_id = ?`, [id_panier]);
+        return { success: true };
+    } 
+    
+    catch (err) {
+        console.error("Erreur lors de la suppression des produits du panier :", err);
+        return { success: false };
+    } 
+    
+    finally {
+        await db.end();
+    }
+}
+
+async function postDeletePanierProduit(id_produit) {
+    const db = await initDB(params);
+
+    try {
+        await db.execute(`DELETE FROM paniers_produits WHERE id = ?`, [id_produit]);
+        return { success: true };
+    } 
+    
+    catch (err) {
+        console.error("Erreur lors de la suppression du produit du panier :", err);
+        return { success: false };
+    } 
+    
+    finally {
+        await db.end();
+    }
+}
 
 
 app.get("/boulangeries/getData", async (request, result) => {
@@ -261,7 +297,6 @@ app.get("/paniers_produits/getDadaId", async (request, result) => {
 })
 
 app.get("/paniers_produits/getProduit", async (request, result) => {
-    const id = request.query.id
     const data = await getProduit()
 
     result.json(data);
@@ -287,6 +322,41 @@ app.post("/paniers_produits/ajouter", async (req, res) => {
         res.status(500).json({ message: "Erreur serveur" });
     }
 })
+
+app.post("/paniers_produits/supprimer", async (req, res) => {
+    const { id_produit } = req.body;
+
+    if (!id_produit) {
+        return res.status(400).json({ message: "ID du produit manquant" })
+    }
+
+    try {
+        const result = await postDeletePanierProduit(id_produit)
+        res.status(200).json({ message: "Produit supprimé du panier", result })
+    } 
+    
+    catch (err) {
+        res.status(500).json({ message: "Erreur serveur" })
+    }
+})
+
+app.post("/paniers/supprimerProduits", async (req, res) => {
+    const { id_panier } = req.body
+
+    if (!id_panier) {
+        return res.status(400).json({ message: "ID du panier manquant" })
+    }
+
+    try {
+        const result = await postDeletePanier(id_panier)
+        res.status(200).json({ message: "Produits du panier supprimés", result })
+    } 
+    
+    catch (err) {
+        res.status(500).json({ message: "Erreur serveur" })
+    }
+})
+
 
 app.listen(API_PORT, () => {
     console.log(`Server running on port ${API_PORT}`);
