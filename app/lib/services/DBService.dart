@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:app/services/GeoService.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 class DbService {
+  /*Recupération des données*/
   static Future<List<dynamic>> getData(String table, int id) async {
     final reponse = await http.get(
       Uri.parse(
@@ -18,6 +21,25 @@ class DbService {
     }
   }
 
+  static Future<List<dynamic>> fetchNearbyBakeries() async {
+    Position? pos = await GeoService().getCurrentPosition();
+    if (pos == null) {
+      throw Exception('Impossible de récupérer la position.');
+    }
+
+    final url = Uri.parse(
+        'https://api-nodejs-production-c1fe.up.railway.app/boulangeries/getDataPos?lat=${pos.latitude}&lon=${pos.longitude}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Erreur dans la récupération des boulangeries');
+    }
+  }
+  
+
+  /*Requete GET*/
   static Future<String> getNom(String table, int id) async {
     final List<dynamic> jsonData = await getData(table, id);
 
@@ -108,6 +130,8 @@ class DbService {
     return jsonData[index]["disponible"].toString();
   }
 
+  
+  /*Requete POST*/
   static Future<void> ajouterAuPanier(
     int panierId,
     int boulangerieProduitId,
@@ -163,4 +187,6 @@ class DbService {
       print("❌ Erreur: ${response.statusCode} - ${response.body}");
     }
   }
+
+  
 }

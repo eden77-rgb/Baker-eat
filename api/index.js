@@ -1,4 +1,4 @@
-/* API : https://api-nodejs-production-c1fe.up.railway.app/boulangerie/getData */
+/* API : https://api-nodejs-production-c1fe.up.railway.app/boulangeries/getData */
 
 require('dotenv').config();
 const express = require('express');
@@ -84,6 +84,53 @@ async function getDataId(table, id) {
         return [];
     }
 
+    finally {
+        await db.end();
+    }
+}
+
+async function getDataPos(lat, lon) {
+    const db = await initDB(params);
+
+    try {
+        const [rows] = await db.execute(`
+            SELECT
+                id,
+                nom,
+                description,
+                image,
+                adresse,
+                latitude,
+                longitude,
+                (
+                    6371 * acos(
+                        cos(radians(?)) *
+                        cos(radians(latitude)) *
+                        cos(radians(longitude) - radians(?)) +
+                        sin(radians(?)) *
+                        sin(radians(latitude))
+                    )
+                ) AS distance_km
+            FROM boulangeries
+            HAVING distance_km < 5
+            ORDER BY distance_km ASC
+        `, [lat, lon, lat]);
+
+        if (rows.length == 0) {
+            console.log("Aucune boulangerie trouvée autour de cette position");
+            return [];
+        } 
+        
+        else {
+            return rows;
+        }
+    } 
+    
+    catch (err) {
+        console.error('Erreur lors de la requête géolocalisation:', err);
+        return [];
+    } 
+    
     finally {
         await db.end();
     }
@@ -231,9 +278,10 @@ async function postDeletePanierProduit(id_produit) {
     finally {
         await db.end();
     }
+    
 }
 
-
+// Routes
 app.get("/boulangeries/getData", async (request, result) => {
     const data = await getData("boulangeries");
 
@@ -245,6 +293,14 @@ app.get("/boulangeries/getDataId/", async (request, result) => {
     const data = await getDataId("boulangeries", id);
 
     result.json(data);
+})
+
+app.get("/boulangeries/getDataPos", async (request, result) => {
+    const lat = request.query.lat
+    const lon = request.query.lon
+    const data = await getDataPos(lat, lon)
+
+    result.json(data)
 })
 
 
